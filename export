@@ -617,6 +617,197 @@ function disablePdfMode() {
 }
 
 // ------------------------------------------------------------
+//Save helpers
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Encrypt/decrypt using Student ID as password (AES-GCM)
+// ------------------------------------------------------------
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+const b64 = {
+  fromBytes: (bytes) => btoa(String.fromCharCode(...bytes)),
+  toBytes: (b64str) => Uint8Array.from(atob(b64str), c => c.charCodeAt(0))
+};
+
+async function deriveAesKeyFromPassword(password, saltBytes, iterations = 150000) {
+  const baseKey = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveKey"]
+  );
+
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: saltBytes, iterations, hash: "SHA-256" },
+    baseKey,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+async function encryptWithStudentId(obj, studentId) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveAesKeyFromPassword(studentId, salt);
+
+  const plaintext = enc.encode(JSON.stringify(obj));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, plaintext));
+
+  return {
+    format: "PHS_SID_ENC_V1",
+    savedAt: new Date().toISOString(),
+    studentId: studentId,          // used for match check (not secret)
+    salt: b64.fromBytes(salt),
+    iv: b64.fromBytes(iv),
+    ct: b64.fromBytes(ct)
+  };
+}
+
+async function decryptWithStudentId(payload, studentId) {
+  if (!payload || payload.format !== "PHS_SID_ENC_V1") throw new Error("Not a valid progress file.");
+
+  const salt = b64.toBytes(payload.salt);
+  const iv = b64.toBytes(payload.iv);
+  const ct = b64.toBytes(payload.ct);
+
+  const key = await deriveAesKeyFromPassword(studentId, salt);
+
+  let pt;
+  try {
+    pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
+  } catch {
+    throw new Error("Cannot decrypt (wrong ID or corrupted file).");
+  }
+
+  return JSON.parse(dec.decode(new Uint8Array(pt)));
+}
+
+function safePart(s) {
+  return (s || "").trim().replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_\-]/g, "");
+}
+
+function getCurrentStudentId() {
+  return (data.id || document.getElementById("id")?.value || "").trim();
+}
+
+// ------------------------------------------------------------
+// Ctrl+S save encrypted (password = student ID)
+// Ctrl+L load encrypted (only if ID matches)
+// ------------------------------------------------------------
+const progressFileInput = document.createElement("input");
+progressFileInput.type = "file";
+progressFileInput.accept = ".puk,application/json,.json";
+progressFileInput.style.display = "none";
+document.body.appendChild(progressFileInput);
+
+async function saveProgressEncrypted() {
+  const studentId = getCurrentStudentId();
+  if (!studentId) return showToast("Enter Student ID first.", false);
+
+  // make sure latest info is stored
+  saveStudentInfo();
+
+  // ensure latest answers are persisted
+  if (currentAssessmentId) {
+    const idx = document.getElementById("assessmentSelector")?.value;
+    const ass = ASSESSMENTS?.[idx];
+    (ass?.questions || []).forEach(q => saveAnswer(q.id));
+  }
+
+  // encrypt current data object
+  const payload = await encryptWithStudentId(data, studentId);
+
+  const filename = `${safePart(studentId)}_${safePart(APP_TITLE || "assessment")}.puk`;
+  const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast("Progress saved (encrypted).");
+}
+
+async function loadProgressEncryptedFile(file) {
+  if (!file) return;
+
+  const studentId = getCurrentStudentId();
+  if (!studentId) return showToast("Enter Student ID first.", false);
+
+  let payload;
+  try {
+    payload = JSON.parse(await file.text());
+  } catch {
+    return showToast("Invalid file.", false);
+  }
+
+  // ✅ match check BEFORE decrypt
+  const fileId = (payload.studentId || "").trim();
+  if (!fileId || fileId !== studentId) {
+    return showToast("Student ID mismatch — not loaded.", false);
+  }
+
+  let restored;
+  try {
+    restored = await decryptWithStudentId(payload, studentId);
+  } catch (e) {
+    return showToast(e.message || "Decryption failed.", false);
+  }
+
+  // ✅ safety: confirm decrypted id too
+  if ((restored.id || "").trim() !== studentId) {
+    return showToast("Decrypted ID mismatch — refusing to load.", false);
+  }
+
+  data = restored;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+  // restore UI
+  if (data.name) document.getElementById("name").value = data.name;
+  if (data.id) document.getElementById("id").value = data.id;
+  if (data.teacher) document.getElementById("teacher").value = data.teacher;
+
+  // re-apply lock
+  const idEl = document.getElementById("id");
+  if (data.idLocked) {
+    idEl.readOnly = true;
+    idEl.classList.add("locked-field");
+    document.getElementById("locked-msg").classList.remove("hidden");
+    document.getElementById("locked-id").textContent = data.id;
+  }
+
+  loadAssessment();
+  showToast("Progress loaded (encrypted).");
+}
+
+progressFileInput.addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  e.target.value = "";
+  await loadProgressEncryptedFile(file);
+});
+
+document.addEventListener("keydown", (e) => {
+  const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  const mod = isMac ? e.metaKey : e.ctrlKey;
+  if (!mod) return;
+
+  if (e.key.toLowerCase() === "s") {
+    e.preventDefault();
+    saveProgressEncrypted();
+  }
+
+  if (e.key.toLowerCase() === "l") {
+    e.preventDefault();
+    progressFileInput.click();
+  }
+});
+
+// ------------------------------------------------------------
 // Deadline helpers
 // ------------------------------------------------------------
 function getDeadlineStatus(now = new Date()) {
