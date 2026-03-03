@@ -697,11 +697,28 @@ function getCurrentStudentId() {
 // Ctrl+S save encrypted (password = student ID)
 // Ctrl+L load encrypted (only if ID matches)
 // ------------------------------------------------------------
-const progressFileInput = document.createElement("input");
-progressFileInput.type = "file";
-progressFileInput.accept = ".puk,application/json,.json";
-progressFileInput.style.display = "none";
-document.body.appendChild(progressFileInput);
+let progressFileInput = null;
+
+function ensureProgressFileInput() {
+  if (progressFileInput) return progressFileInput;
+
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = ".puk,application/json,.json";
+  inp.style.display = "none";
+
+  // ✅ body might not exist yet if script runs in <head>
+  (document.body || document.documentElement).appendChild(inp);
+
+  inp.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    await loadProgressEncryptedFile(file);
+  });
+
+  progressFileInput = inp;
+  return progressFileInput;
+}
 
 async function saveProgressEncrypted() {
   const studentId = getCurrentStudentId();
@@ -785,11 +802,7 @@ async function loadProgressEncryptedFile(file) {
   showToast("Progress loaded (encrypted).");
 }
 
-progressFileInput.addEventListener("change", async (e) => {
-  const file = e.target.files?.[0];
-  e.target.value = "";
-  await loadProgressEncryptedFile(file);
-});
+
 
 document.addEventListener("keydown", (e) => {
   const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
@@ -803,7 +816,7 @@ document.addEventListener("keydown", (e) => {
 
   if (e.key.toLowerCase() === "l") {
     e.preventDefault();
-    progressFileInput.click();
+   ensureProgressFileInput().click();
   }
 });
 
