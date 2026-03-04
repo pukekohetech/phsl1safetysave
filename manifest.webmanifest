@@ -1,6 +1,6 @@
 {
-  "name": "PHS Safety Assessment",
-  "short_name": "PHS24352",
+  "name": "PHS New Assessment",
+  "short_name": "PHSNew",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
