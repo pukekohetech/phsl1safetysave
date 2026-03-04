@@ -1,0 +1,132 @@
+{
+  "APP_ID": "Pukekohe High School - Design Problem and Brief",
+  "VERSION": "2026.1",
+  "APP_TITLE": "Writing a Design Problem, Brief and Specification",
+  "APP_SUBTITLE": "Learning Assessment - Clear Language, Clear Evidence",
+  "DEADLINE": {
+    "day": 6,
+    "month": 3,
+    "label": "Submission deadline"
+  },
+  "TEACHERS": [
+    {
+      "id": "RY",
+      "name": "Mr Reynolds",
+      "email": "ry@pukekohehigh.school.nz"
+    }
+  ],
+  "ASSESSMENTS": [
+
+    {
+      "id": "PHS Problem and Brief Activity",
+      "title": "Stage 1 – Writing a Design Problem and Brief",
+      "subtitle": "Task 1",
+      "usNumber": "",
+      "usVersion": "",
+      "credits": null,
+      "standardType": "internal",
+      "questions": [
+        {
+          "id": "Write a Design Problem and Brief",
+          "text": "Describe the design problem and write a brief for your project.\n\nIn your response, you must:\n- clearly explain what the problem or need is\n- identify who the stakeholder(s) are\n- explain why this is a problem and why it needs to be solved\n- describe the context or situation where the problem exists\n- explain what the design outcome needs to achieve (do not describe your final solution)\n- include any constraints or limitations that will affect the design\n\nYour answer should focus on the need, not the solution, and should guide the rest of your project.",
+          "image": "",
+          "hint": "To PASS, your response must clearly show that you understand the PROBLEM and the BRIEF.\n\nCheck your work against these questions:\n\nDESIGN PROBLEM\n• Have you clearly stated what the problem or need is?\n• Have you said who is affected by the problem?\n• Have you explained WHY this is a problem and why it needs to be solved?\n• Have you described where or when the problem occurs?\n\nDESIGN BRIEF\n• Have you explained what the outcome needs to achieve?\n• Have you used phrases like: “The outcome needs to…”, “It must…”, or “It is required to…”?\n• Have you avoided describing what your final solution looks like?\n\nCONSTRAINTS\n• Have you mentioned at least one limitation (time, cost, materials, tools, size, safety, or school rules)?\n\nBefore submitting, check that:\n✓ You mention the problem, the users, and the context\n✓ You explain why the problem matters\n✓ You focus on NEEDS, not your solution idea\n\nIf any of these are missing, you are unlikely to pass.",   "type": "long",
+          "maxPoints": 10,
+          "rubric": [
+            {
+              "points": 2,
+              "check": "\\b(problem|issue|need|lack|missing|challenge|difficulty)\\b",
+              "flags": "i"
+            },
+            {
+              "points": 2,
+              "check": "\\b(stakeholder|user|client|students?|teachers?|people|anyone|someone|community)\\b",
+              "flags": "i"
+            },
+            {
+              "points": 2,
+              "check": "\\b(why|because|causes|results in|leads to|affects?|impacts?)\\b",
+              "flags": "i"
+            },
+            {
+              "points": 2,
+              "check": "\\b(where|when|during|at school|at home|in class|daily|regularly)\\b",
+              "flags": "i"
+            },
+            {
+              "points": 2,
+              "check": "\\b(must|needs to|required to|should|aims to|intended to)\\b",
+              "flags": "i"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "PHS Specification Activity",
+      "title": "Stage 2 – Writing a Specification",
+      "subtitle": "Task 2",
+      "usNumber": "",
+      "usVersion": "",
+      "credits": null,
+      "standardType": "internal",
+      "questions": [
+        {
+          "id": "Write a Specification",
+          "text": "Write a specification for your design outcome.\n\nYour specification must:\n- be written as a list of clear criteria\n- use measurable or testable language\n- describe what the outcome must achieve\n- include constraints and requirements\n\nDo NOT describe your final solution.",
+          "image": "",
+          "hint": "To PASS, your specification must be written as a clear list of criteria (bullet points or numbered).\n\nEach point should:\n• Start with: “The outcome must…” or “It must…”\n• Be measurable or testable (include numbers where possible)\n• Focus on what it must DO or achieve — NOT what it will look like\n\nA strong specification usually includes criteria for:\n1) Function – What must it do? (e.g., The outcome must securely hold 4 textbooks.)\n2) User – Who must it work for? (e.g., The outcome must be suitable for Year 9–10 students.)\n3) Size – Dimensions or limits (e.g., Must be no larger than 400mm x 300mm.)\n4) Materials – What is allowed or restricted (e.g., Must use sustainable timber available in the workshop.)\n5) Safety – What risks must be reduced or avoided (e.g., Must have no sharp edges.)\n6) Durability – How strong or long-lasting (e.g., Must support at least 10kg without bending.)\n7) Cost/Time – Budget or deadline limits (e.g., Must cost under $30 and be completed within 3 weeks.)\n8) Sustainability – Waste, reuse, environmental impact.\n9) Testing – How you will check success (e.g., It will be tested by loading it with 10kg for 1 minute.)\n\nAvoid vague statements like:\n✗ It should look cool.\n✗ It should be good quality.\n✗ I will make it out of plywood.\n\nInstead, make every point specific and measurable.",
+
+          "type": "long",
+          "maxPoints": 16,
+  "rubric": [
+  {
+    "points": 2,
+    "check": "\\b(must|needs\\s*to|required\\s*to|shall|should)\\b",
+    "flags": "i"
+  },
+  {
+    "points": 2,
+    "check": "\\b(mm|cm|m|metre(s)?|meter(s)?|kg|g|%|hours?|minutes?|weeks?|\\$|dollars?)\\b|\\b\\d+(\\.\\d+)?\\b",
+    "flags": "i"
+  },
+  {
+    "points": 2,
+    "check": "\\b(test|testing|tested|measure|measurable|verify|validated?|check|evidence|demonstrate)\\b",
+    "flags": "i"
+  },
+  {
+    "points": 2,
+    "check": "\\b(size|dimension(s)?|width|height|length|depth|thickness|weight|maximum|max|min(imum)?|limit(s)?|fit\\s*within|no\\s*(larger|bigger|greater)\\s*than|no\\s*more\\s*than|at\\s*most|up\\s*to|under)\\b",
+    "flags": "i"
+  },
+  {
+    "points": 2,
+    "check": "\\b(material(s)?|wood|metal|plastic|fabric|plywood|acrylic|cardboard|recycled|reuse(d)?|sustainable|environmentally\\s*friendly|eco(-|\\s)?friendly)\\b",
+    "flags": "i"
+  },
+  {
+    "points": 2,
+    "check": "\\b(safe|safety|hazard(s)?|risk(s)?|stable|durable|durability|strong|strength|sturdy|robust|resist(s|ed|ing)?\\s*damage|damage\\s*resistant|withstand(s|ing)?|impact|drop(ping)?|regular\\s*use|long(-|\\s)?lasting)\\b",
+    "flags": "i"
+  },
+  {
+    "points": 2,
+    "check": "\\b(function|purpose|do(es)?|perform(s|ance)?|operate(s|ion)?|allow(s)?|enable(s)?|support(s)?|provide(s|d)?|hold(s|ing)?|store(s|d|age)?|organis(e|z)(s|ed|ing)?|keep(s|ing)?|contain(s|ed|ing)?|fit(s|ted|ting)?|secure(s|d|ing)?)\\b",
+    "flags": "i"
+  },
+  {
+    "points": 2,
+    "check": "(?:\\n|\\-|\\d+\\.).{0,400}(?:\\n|\\-|\\d+\\.).{0,400}",
+    "flags": "s"
+  }
+]
+
+           
+        }
+      ]
+    }
+
+  ]
+}
